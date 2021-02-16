@@ -16,10 +16,18 @@ const cors = require('cors')
 const bodyParser = require('body-parser')
 app.use(bodyParser.json())
 
+// Route List
+const routeUsers = require('./res/routes/users')
+app.use(routeUsers)
+
 // Display Default Route
 app.use('/', (req, res) => {
   res.send('Psst, Your Backend is Online.')
 })
+
+// Image Path
+app.use('/img', express.static('./public/img'))
+
 // Server HTTP Socket IO
 const server = http.createServer(app)
 const io = socketio(server, {

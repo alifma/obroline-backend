@@ -3,7 +3,7 @@ module.exports = {
 
   // Kalau Tidak ada Error
   success: (res, rescode, message, pagination, arr) => {
-      res.code(rescode).json({
+      res.status(rescode).json({
           code: rescode,
           msg: message,
           pagination,
@@ -13,7 +13,7 @@ module.exports = {
 
   // Kalau ada error
   error: (res, rescode, message, sysMsg, arr) => {
-      res.code(rescode).json({
+      res.status(rescode).json({
           code: rescode,
           msg: message,
           pagination: {
@@ -25,7 +25,7 @@ module.exports = {
 
   // Kalau tidak ketemu routenya
   notFound: (res, message) => {
-      res.code(rescode).json({
+      res.status(rescode).json({
           code: 404,
           msg: message,
       })
