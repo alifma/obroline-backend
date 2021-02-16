@@ -17,10 +17,10 @@ module.exports = {
               const dataUser = {
                 email: response[0].email,
                 id: response[0].id,
-                access: response[0].access
+                name: response[0].name
               }
               const jwttoken = jwt.sign(dataUser, process.env.JWT_SECRET)
-              success(res, 200, 'Login Success', {name: response[0].name, access: response[0].access, token: jwttoken})
+              success(res, 200, 'Login Success', {user: response[0], token: jwttoken})
             }else{
               error(res, 400, 'Login Failed', 'Wrong Password')
             }
