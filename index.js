@@ -21,15 +21,15 @@ app.use(bodyParser.json())
 const routeUsers = require('./res/routes/users')
 app.use(routeUsers)
 
-// Display Default Route
-app.use('/', (req, res) => {
-  res.send('Psst, Your Backend is Online.')
-})
 
 // Image Path
 app.use('/img', express.static('./public/img'))
 
 
+// Display Default Route
+app.use('/', (req, res) => {
+  res.send('Psst, Your Backend is Online.')
+})
 
 // Server HTTP Socket IO
 const server = http.createServer(app)
