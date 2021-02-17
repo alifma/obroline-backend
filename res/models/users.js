@@ -7,7 +7,7 @@ module.exports = {
     return
   },
   // Get Detail Users
-  mGetDetailUser: (id) => {
+  mDetailUser: (id) => {
     return new Promise((resolve, reject) => {
       connection.query(`SELECT * FROM users WHERE id=${id}`, (err, result) => {
         if (err) {
@@ -53,5 +53,18 @@ module.exports = {
         }
       })
     })
-  }
+  },
+  // Update Detail User
+  mPatchUser: (data, id) => {
+    return new Promise((resolve, reject) => {
+      connection.query(`UPDATE users SET ? WHERE id=?`, [data, id],
+        (error, result) => {
+          if (error) {
+            reject(new Error(error))
+          } else {
+            resolve(result)
+          }
+        })
+    })
+  },
 }

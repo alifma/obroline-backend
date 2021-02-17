@@ -1,8 +1,10 @@
 const bcrypt = require('bcrypt')
-const { mRegister, mCheckEmail } = require('../models/users')
+const { mRegister, mCheckEmail, mPatchUser, mDetailUser } = require('../models/users')
 const jwt = require('jsonwebtoken')
 // Response Helper 
 const { error, success } = require('../helpers/response')
+// Remove File Operation
+const fs = require('fs')
 
 module.exports = {
   login : (req, res) => {
@@ -69,5 +71,58 @@ module.exports = {
     } catch {
       error(res, 500, 'Internal Server Error', '')
     }
-  }
+  },
+  patchUser: async(req, res) => {
+    try {
+      const id = req.params.id
+      const data = req.body
+      if (req.file || data.name || data.username || data.handphone || data.email || data.bio) {
+        let dataUpdate = {}
+        // Kalau ada file, maka Imagenya dibawa
+        if (req.file) {
+          dataUpdate = {
+            ...data,
+            image: req.file.filename
+          }
+          mDetailUser(id)
+            .then((res) => {
+              if (res[0].image !== 'default.png') {
+                fs.unlinkSync(`./public/img/${res[0].image}`)
+              }
+            })
+            .catch((err) => {
+              console.log(err)
+            })
+        } else {
+          dataUpdate = {
+            ...data
+          }
+        }
+        mPatchUser(dataUpdate, id)
+          .then((response) => {
+            if (response.affectedRows != 0) {
+              success(res, 200, 'Patch data Success', {}, {})
+            } else {
+              if (req.file) {
+                fs.unlinkSync(`./public/img/${req.file.filename}`)
+              }
+              error(res, 400, 'Nothing Patched, Wrong ID', {}, {})
+            }
+          })
+          .catch((err) => {
+            if (req.file) {
+              fs.unlinkSync(`./public/img/${req.file.filename}`)
+            }
+            error(res, 400, 'Wrong Data Type Given', err.message, {})
+          })
+      } else {
+        error(res, 400, 'Nothing Patched, No Data Given', 'Empty Data', {})
+      }
+    } catch (err) {
+      if (req.file) {
+        fs.unlinkSync(`./public/img/${req.file.filename}`)
+      }
+      error(res, 500, 'Internal Server Error', err.message, {})
+    }
+    }
 }
