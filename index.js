@@ -85,10 +85,8 @@ io.on('connection', (socket) => {
     console.log('Sending chat data to DB')
     mSendChat(data)
       .then((res) => {
-        console.log('Fetching Chat Again')
         mGetChat(data)
           .then((response) => {
-            console.log(response)
             io.to(response[0].targetRoomId).emit('res-get-list-chat', response)
             io.to(response[0].senderRoomId).emit('res-get-list-chat', response)
           })
