@@ -124,5 +124,15 @@ module.exports = {
       }
       error(res, 500, 'Internal Server Error', err.message, {})
     }
-    }
+  },
+  detailUser: (req, res) => {
+    const id = req.params.id
+    mDetailUser(id)
+      .then((response) => {
+        success(res, 200, 'Display Data Success', {},  response)
+      })
+      .catch((err) => {
+        error(res, 500, 'Internal Server Error', err.message, {})
+      })
+  }
 }

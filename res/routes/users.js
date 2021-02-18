@@ -1,4 +1,4 @@
-const { login, register, patchUser } = require('../controllers/users')
+const { login, register, patchUser, detailUser } = require('../controllers/users')
 const { singleUpload } = require('../helpers/upload')
 const express = require('express')
 
@@ -7,5 +7,6 @@ route
   .post('/api/login', login)
   .post('/api/register', register)
   .patch('/api/user/:id', singleUpload, patchUser)
+  .get('/api/user/:id', detailUser)
 
 module.exports = route
