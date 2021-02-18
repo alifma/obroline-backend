@@ -56,6 +56,7 @@ module.exports = {
               username: body.email,
               email: body.email,
               image: 'default.png',
+              location: '0,0',
               bio: '-',
               password
             }
@@ -76,7 +77,7 @@ module.exports = {
     try {
       const id = req.params.id
       const data = req.body
-      if (req.file || data.name || data.username || data.handphone || data.email || data.bio) {
+      if (req.file || data.name || data.username || data.handphone || data.email || data.bio || data.location) {
         let dataUpdate = {}
         // Kalau ada file, maka Imagenya dibawa
         if (req.file) {
