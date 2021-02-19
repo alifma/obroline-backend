@@ -55,26 +55,46 @@ io.on('connection', (socket) => {
       })
   })
   socket.on('disconnect', () => {
-    mLogout(socket.id)
-      .then((response) => {
-        const socketData = {socketId: ''}
-        mPatchUser(socketData, response[0].id)
-        console.log(`${response[0].username} is disconnected`)
-      })
-      .catch((err) => {
-        console.log(err)
-      })
+    try{
+      mLogout(socket.id)
+        .then((response) => {
+          if(response.lentch> 0) {
+            const socketData = {
+              socketId: null
+            }
+            mPatchUser(socketData, response[0].id)
+            console.log(`${response[0].username} is disconnected`)
+          } else {
+            console.log('id not found')
+          }
+        })
+        .catch((err) => {
+          console.log(err)
+        })
+    } catch {
+      console.log('Server Side Error')
+    }
   })
   socket.on('logout', () => {
-    mLogout(socket.id)
-    .then((response) => {
-      const socketData = {socketId: ''}
-      mPatchUser(socketData, response[0].id)
-      console.log(`${response[0].username} is disconnected`)
-    })
-    .catch((err) => {
-      console.log(err)
-    })
+    try {
+      mLogout(socket.id)
+        .then((response) => {
+          if(response.length > 0) {
+            const socketData = {
+              socketId: null
+            }
+            mPatchUser(socketData, response[0].id)
+            console.log(`${response[0].username} is disconnected`)
+          } else {
+            console.log('id not found')
+          }
+        })
+        .catch((err) => {
+          console.log(err)
+        })
+    } catch {
+      console.log('Server Side Error')
+    }
   })
   // Login Kedalam room
   socket.on('join-room', (roomId) => {
