@@ -41,7 +41,7 @@ const io = socketio(server, {
 // Config Event Socket IO
 io.on('connection', (socket) => {
   // Panggil Model user & Chat
-  const { mGetFriends, mPatchUser, mLogout, mSearchUser} = require('./res/models/users')
+  const { mGetFriends, mPatchUser, mLogout, mSearchUser, mAddFriends} = require('./res/models/users')
   const { mGetChat, mSendChat } = require('./res/models/chat')
   // Notif User ada Yang Online
   socket.on('connected', (data) => {
@@ -156,6 +156,45 @@ io.on('connection', (socket) => {
         console.log(err)
       })
     })
+
+  socket.on('add-friends', (data) => {
+    const dataA = {
+      userId: data.userId,
+      targetId: data.targetId,
+      status: data.status
+    }
+    const dataB = {
+      userId: data.targetId,
+      targetId: data.userId,
+      status: data.status
+    }
+    mAddFriends(dataA)
+      .then((res1) => {
+        mAddFriends(dataB)
+          .then((res2) => {
+            mGetFriends(data.userId)
+              .then((resUser) => {
+                io.to(data.userRoomId).emit('res-get-list-users', resUser)
+                mGetFriends(data.targetId)
+                  .then((resTarget) => {
+                    io.to(data.targetRoomId).emit('res-get-list-users', resTarget)
+                  })
+                  .catch((err) => {
+                    console.log(err)
+                  })
+              })
+              .catch((err) => {
+                console.log(err)
+              })
+          })
+          .catch((err) => {
+            console.log(err)
+          })
+      })
+      .catch((err) => {
+        console.log(err)
+      })
+  })
 })
 
 // Start Server

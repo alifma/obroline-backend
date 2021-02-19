@@ -91,4 +91,15 @@ module.exports = {
       })
     })
   },
+  mAddFriends: (dataUser) => {
+    return new Promise((resolve, reject) => {
+      connection.query(`INSERT INTO friendship SET ?`, dataUser, (err, result) => {
+        if (err) {
+          reject(err)
+        } else {
+          resolve(result)
+        }
+      })
+    })
+  }
 }
