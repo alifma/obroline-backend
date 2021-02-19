@@ -5,7 +5,7 @@ const connection = require('../config/database')
 module.exports = {
   mGetChat: (data) => {
     return new Promise((resolve, reject) => {
-      const sql = `SELECT chat.senderId as senderId, chat.targetId as targetId, chat.message as message, sender.name as senderName, sender.roomId as senderRoomId, target.roomId as targetRoomId FROM chat LEFT JOIN users as sender ON chat.senderId=sender.id LEFT JOIN users as target ON chat.targetId = target.id
+      const sql = `SELECT chat.senderId as senderId, chat.created_at as created_at, chat.targetId as targetId, chat.message as message, sender.name as senderName, sender.roomId as senderRoomId, target.roomId as targetRoomId FROM chat LEFT JOIN users as sender ON chat.senderId=sender.id LEFT JOIN users as target ON chat.targetId = target.id
       WHERE 
       (senderId='${data.senderId}' AND targetId='${data.targetId}') 
       OR 
