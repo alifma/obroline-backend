@@ -67,4 +67,15 @@ module.exports = {
         })
     })
   },
+  mLogout: (socketId) => {
+    return new Promise((resolve, reject) => {
+      connection.query(`SELECT * FROM users WHERE socketId like '${socketId}'`, (err, result) => {
+        if (err) {
+          reject(err)
+        } else {
+          resolve(result)
+        }
+      })
+    })
+  },
 }

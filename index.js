@@ -38,27 +38,56 @@ const io = socketio(server, {
     origin: '*'
   }
 })
-
 // Config Event Socket IO
 io.on('connection', (socket) => {
   // Panggil Model user & Chat
-  const { mAllUser } = require('./res/models/users')
+  const { mAllUser, mPatchUser, mLogout } = require('./res/models/users')
   const { mGetChat, mSendChat } = require('./res/models/chat')
-  
   // Notif User ada Yang Online
-  console.log('user is Online!')
+  socket.on('connected', (data) => {
+    const socketData = {socketId: socket.id}
+    mPatchUser(socketData, data.id)
+      .then((res) => {
+        console.log(`${data.username} is Online on socket ${socket.id}`)
+      })
+      .catch((err) => {
+        console.log(err)
+      })
+  })
+  socket.on('disconnect', () => {
+    mLogout(socket.id)
+      .then((response) => {
+        const socketData = {socketId: ''}
+        mPatchUser(socketData, response[0].id)
+        console.log(`${response[0].username} is disconnected`)
+      })
+      .catch((err) => {
+        console.log(err)
+      })
+  })
+  socket.on('logout', () => {
+    mLogout(socket.id)
+    .then((response) => {
+      const socketData = {socketId: ''}
+      mPatchUser(socketData, response[0].id)
+      console.log(`${response[0].username} is disconnected`)
+    })
+    .catch((err) => {
+      console.log(err)
+    })
+  })
   // Login Kedalam room
   socket.on('join-room', (roomId) => {
-    console.log(`Room ID ${roomId} joined`)
+    // console.log(`Room ID ${roomId} joined`)
     socket.join(roomId)
   })
 
   // Ambil Semua User (Soon diganti Friendlist)
   socket.on('get-list-users', (userId, roomId) => {
-    console.log(` Displaying Users for UserID ${userId} at RoomID: ${roomId}`)
+    // console.log(` Displaying Users for UserID ${userId} at RoomID: ${roomId}`)
     mAllUser(userId)
       .then((res) => {
-        console.log(`resource are sended to user RoomId : ${roomId}`)
+        // console.log(`resource are sended to user RoomId : ${roomId}`)
         io.to(roomId).emit('res-get-list-users', res)
       })
       .catch((err) => {
@@ -68,11 +97,11 @@ io.on('connection', (socket) => {
 
   // Ambil List Chat
   socket.on('get-list-chat', (data) => {
-    console.log('Fetching chat data From DB')
+    // console.log('Fetching chat data From DB')
     mGetChat(data)
       .then((res) => {
-        console.log(`Sending result to room #${data.roomId}`)
-        console.log(`Datanya : ${res}`)
+        // console.log(`Sending result to room #${data.roomId}`)
+        // console.log(`Datanya : ${res}`)
         // Kirrim ke Room ID
         io.to(data.roomId).emit('res-get-list-chat', res)
       })
@@ -82,7 +111,7 @@ io.on('connection', (socket) => {
   })
   
   socket.on('send-message', (data) => {
-    console.log('Sending chat data to DB')
+    // console.log('Sending chat data to DB')
     mSendChat(data)
       .then((res) => {
         mGetChat(data)
