@@ -42,10 +42,23 @@ module.exports = {
       })
     })
   },
-  // Get All User
-  mAllUser: (userId) => {
+  // GetFriends
+  mGetFriends: (userId) => {
     return new Promise((resolve, reject) => {
-      connection.query(`SELECT * FROM users WHERE id != ${userId}`, (err, result) => {
+      connection.query(`SELECT target.id as id, target.roomId as roomId, target.name as name, target.username as username, target.handphone as handphone, target.email as email, target.image as image, target.bio as bio, target.location as location, target.socketId as socketId,
+      friendship.status as friendshipStatus FROM friendship LEFT JOIN users as target ON friendship.targetId = target.id WHERE friendship.userId = ${userId}`, (err, result) => {
+        if (err) {
+          reject(err)
+        } else {
+          resolve(result)
+        }
+      })
+    })
+  },
+  // GetAllUser
+  mSearchUser: (data) => {
+    return new Promise((resolve, reject) => {
+      connection.query(`SELECT * FROM users where id != ${data.id} AND name LIKE '%${data.searchName}%'`, (err, result) => {
         if (err) {
           reject(err)
         } else {

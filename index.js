@@ -41,7 +41,7 @@ const io = socketio(server, {
 // Config Event Socket IO
 io.on('connection', (socket) => {
   // Panggil Model user & Chat
-  const { mAllUser, mPatchUser, mLogout } = require('./res/models/users')
+  const { mGetFriends, mPatchUser, mLogout, mSearchUser} = require('./res/models/users')
   const { mGetChat, mSendChat } = require('./res/models/chat')
   // Notif User ada Yang Online
   socket.on('connected', (data) => {
@@ -102,10 +102,19 @@ io.on('connection', (socket) => {
     socket.join(roomId)
   })
 
+  socket.on('search-name', (data) => {
+    mSearchUser(data)
+      .then((response) => {
+        io.to(data.roomId).emit('res-search-name', response)
+      })
+      .catch((err) => {
+        console.log(err)
+      })
+  })
   // Ambil Semua User (Soon diganti Friendlist)
   socket.on('get-list-users', (userId, roomId) => {
     // console.log(` Displaying Users for UserID ${userId} at RoomID: ${roomId}`)
-    mAllUser(userId)
+    mGetFriends(userId)
       .then((res) => {
         // console.log(`resource are sended to user RoomId : ${roomId}`)
         io.to(roomId).emit('res-get-list-users', res)
