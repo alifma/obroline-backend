@@ -101,5 +101,16 @@ module.exports = {
         }
       })
     })
+  },
+  mDeleteFriends: (data) => {
+    return new Promise((resolve, reject) => {
+      connection.query(`DELETE FROM friendship WHERE userId = ${data.userId} AND targetId = ${data.targetId}`, (err, result) => {
+        if (err) {
+          reject(err)
+        } else {
+          resolve(result)
+        }
+      })
+    })
   }
 }
