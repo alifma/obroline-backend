@@ -41,7 +41,7 @@ const io = socketio(server, {
 // Config Event Socket IO
 io.on('connection', (socket) => {
   // Panggil Model user & Chat
-  const { mGetFriends, mPatchUser, mLogout, mSearchUser, mAddFriends, mDeleteFriends} = require('./res/models/users')
+  const { mGetFriends, mPatchUser, mLogout, mSearchUser, mAddFriends, mDeleteFriends, mDetailUser} = require('./res/models/users')
   const { mGetChat, mSendChat } = require('./res/models/chat')
   // Notif User ada Yang Online
   socket.on('connected', (data) => {
@@ -145,13 +145,30 @@ io.on('connection', (socket) => {
       .then((res) => {
         mGetChat(data)
           .then((response) => {
-            io.to(response[0].targetRoomId).emit('res-get-list-chat', response)
-            io.to(response[0].senderRoomId).emit('res-get-list-chat', response)
+            mDetailUser(data.targetId)
+              .then((resTarget) => {
+                mDetailUser(data.senderId)
+                  .then((resSender) => {
+                    io.to(response[0].targetRoomId).emit('res-get-list-chat', response)
+                    io.to(resTarget[0].roomId).emit('res-new-chat', {data: 'New Message', from: resSender[0].name, message: data.msg })
+                    io.to(response[0].senderRoomId).emit('res-get-list-chat', response)
+                  })
+                  .catch((err) => {
+                    // Error dari Sender
+                    console.log(err)
+                  })
+              })
+              // Error dari target
+              .catch((err) => {
+                console.log(err)
+              })
           })
+          // Error cari History Chat
           .catch((err) => {
             console.log(err)
           })
       })
+      // Error kirim pesan
       .catch((err) => {
         console.log(err)
       })
