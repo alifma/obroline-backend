@@ -1,5 +1,5 @@
 const bcrypt = require('bcrypt')
-const { mRegister, mCheckEmail, mPatchUser, mDetailUser, mAddUser } = require('../models/users')
+const { mRegister, mCheckEmail, mPatchUser, mDetailUser } = require('../models/users')
 const jwt = require('jsonwebtoken')
 // Response Helper 
 const { error, success } = require('../helpers/response')
@@ -7,6 +7,7 @@ const { error, success } = require('../helpers/response')
 const fs = require('fs')
 
 module.exports = {
+  // Login
   login : (req, res) => {
     const body = req.body
     try {
@@ -38,6 +39,7 @@ module.exports = {
       error(res, 500, 'Internal Server Error', '')
     }
   },
+  // Register
   register : async (req, res) => {
     const body = req.body
     try {
@@ -73,6 +75,7 @@ module.exports = {
       error(res, 500, 'Internal Server Error', '')
     }
   },
+  // Update User
   patchUser: async(req, res) => {
     try {
       const id = req.params.id
@@ -126,6 +129,7 @@ module.exports = {
       error(res, 500, 'Internal Server Error', err.message, {})
     }
   },
+  // Detail dari user
   detailUser: (req, res) => {
     const id = req.params.id
     mDetailUser(id)

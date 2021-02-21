@@ -1,11 +1,16 @@
+// Require Package Socket.IO
 const socketio = require('socket.io')
 
+// Export Server Socket
 module.exports = (server) => {
+
+// CORS SocketIO
 const io = socketio(server, {
   cors: {
     origin: '*'
   }
 })
+
 // Config Event Socket IO
 io.on('connection', (socket) => {
   // Panggil Model user & Chat
@@ -14,6 +19,7 @@ io.on('connection', (socket) => {
   // Notif User ada Yang Online
   socket.on('connected', (data) => {
     const socketData = {socketId: socket.id}
+    // Set Socket ID yang connect ke database
     mPatchUser(socketData, data.id)
       .then((res) => {
         console.log(`${data.username} is Online on socket ${socket.id}`)
@@ -22,6 +28,7 @@ io.on('connection', (socket) => {
         console.log(err)
       })
   })
+  // Hapus SocketID yang disconnected
   socket.on('disconnect', () => {
     try{
       mLogout(socket.id)
@@ -43,6 +50,8 @@ io.on('connection', (socket) => {
       console.log('Server Side Error')
     }
   })
+
+  // Hapus SocketID yang Logout
   socket.on('logout', () => {
     try {
       mLogout(socket.id)
@@ -69,7 +78,7 @@ io.on('connection', (socket) => {
     // console.log(`Room ID ${roomId} joined`)
     socket.join(roomId)
   })
-
+  // Pencarian Nama
   socket.on('search-name', (data) => {
     mSearchUser(data)
       .then((response) => {
@@ -81,16 +90,8 @@ io.on('connection', (socket) => {
   })
   // Ambil Semua User (Soon diganti Friendlist)
   socket.on('get-list-users', (userId, roomId) => {
-    // console.log(` Displaying Users for UserID ${userId} at RoomID: ${roomId}`)
-    const addDetail = async item => {
-      mDetailChat(item)
-        .then((resnya) => {
-          return(resnya)
-        })
-    }
-    let finalData = [] 
     mGetFriends(userId)
-      .then(async (res) => {
+      .then((res) => {
         // console.log(`resource are sended to user RoomId : ${roomId}`)
         io.to(roomId).emit('res-get-list-users', res)
       })
@@ -104,8 +105,6 @@ io.on('connection', (socket) => {
     // console.log('Fetching chat data From DB')
     mGetChat(data)
       .then((res) => {
-        // console.log(`Sending result to room #${data.roomId}`)
-        // console.log(`Datanya : ${res}`)
         // Kirrim ke Room ID
         io.to(data.roomId).emit('res-get-list-chat', res)
       })
@@ -114,6 +113,7 @@ io.on('connection', (socket) => {
       })
   })
   
+  // Kirim Pesan
   socket.on('send-message', (data) => {
     // console.log('Sending chat data to DB')
     mSendChat(data)
@@ -149,6 +149,7 @@ io.on('connection', (socket) => {
       })
     })
 
+  // Tambahkan Teman
   socket.on('add-friends', (data) => {
     const dataA = {
       userId: data.userId,
@@ -187,6 +188,7 @@ io.on('connection', (socket) => {
         console.log(err)
       })
   }),
+  // Hapus Teman
   socket.on('delete-friends', (data) => {
     console.log(`Someone want to delete ${data}`)
     const dataA = {
