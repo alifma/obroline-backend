@@ -19,6 +19,18 @@ module.exports = {
       })
     })
   },
+  mDetailChat: (id) => {
+    return new Promise((resolve, reject) => {
+      const sql = `SELECT * FROM chat WHERE id = ${id}`
+      connection.query(sql, (err, result) => {
+        if (err) {
+          reject(err)
+        } else {
+          resolve(result)
+        }
+      })
+    })
+  },
   mSendChat: (data) => {
     return new Promise((resolve, reject) => {
       const sql = `INSERT INTO chat (senderId, targetId, message) VALUES  (${data.senderId},${data.targetId},'${data.msg}')`

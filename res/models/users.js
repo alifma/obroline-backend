@@ -45,8 +45,11 @@ module.exports = {
   // GetFriends
   mGetFriends: (userId) => {
     return new Promise((resolve, reject) => {
-      connection.query(`SELECT target.id as id, target.roomId as roomId, target.name as name, target.username as username, target.handphone as handphone, target.email as email, target.image as image, target.bio as bio, target.location as location, target.socketId as socketId,
-      friendship.status as friendshipStatus FROM friendship LEFT JOIN users as target ON friendship.targetId = target.id WHERE friendship.userId = ${userId}`, (err, result) => {
+      const sql1 = `SELECT MAX(chat.id) as newChatId, chat.message as message, chat.created_at as created_at, chat.senderId as senderId, target.id as id, target.roomId as roomId, target.name as name, target.username as username, target.handphone as handphone, target.email as email, target.image as image, target.bio as bio, target.location as location, target.socketId as socketId,
+      friendship.status as friendshipStatus FROM friendship LEFT JOIN users as target ON friendship.targetId = target.id LEFT JOIN chat ON (target.id = chat.senderId AND chat.targetID = friendship.userId ) OR (target.id = chat.targetId AND chat.senderID = friendship.userId ) WHERE friendship.userId = ${userId} GROUP BY target.id`
+      const sql2 = `SELECT target.id as id, target.roomId as roomId, target.name as name, target.username as username, target.handphone as handphone, target.email as email, target.image as image, target.bio as bio, target.location as location, target.socketId as socketId,
+      friendship.status as friendshipStatus FROM friendship LEFT JOIN users as target ON friendship.targetId = target.id WHERE friendship.userId = ${userId}`
+      connection.query(sql1, (err, result) => {
         if (err) {
           reject(err)
         } else {

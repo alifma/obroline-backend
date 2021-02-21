@@ -42,7 +42,7 @@ const io = socketio(server, {
 io.on('connection', (socket) => {
   // Panggil Model user & Chat
   const { mGetFriends, mPatchUser, mLogout, mSearchUser, mAddFriends, mDeleteFriends, mDetailUser} = require('./res/models/users')
-  const { mGetChat, mSendChat } = require('./res/models/chat')
+  const { mGetChat, mSendChat, mDetailChat} = require('./res/models/chat')
   // Notif User ada Yang Online
   socket.on('connected', (data) => {
     const socketData = {socketId: socket.id}
@@ -114,8 +114,15 @@ io.on('connection', (socket) => {
   // Ambil Semua User (Soon diganti Friendlist)
   socket.on('get-list-users', (userId, roomId) => {
     // console.log(` Displaying Users for UserID ${userId} at RoomID: ${roomId}`)
+    const addDetail = async item => {
+      mDetailChat(item)
+        .then((resnya) => {
+          return(resnya)
+        })
+    }
+    let finalData = [] 
     mGetFriends(userId)
-      .then((res) => {
+      .then(async (res) => {
         // console.log(`resource are sended to user RoomId : ${roomId}`)
         io.to(roomId).emit('res-get-list-users', res)
       })
