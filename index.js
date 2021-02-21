@@ -3,6 +3,9 @@ const express = require('express')
 const http = require('http')
 const app = express()
 
+// History Router
+const history = require('connect-history-api-fallback')
+
 // Ambil file Socket
 const socket = require('./res/socket/socket')
 
@@ -26,10 +29,12 @@ app.use(routeUsers)
 // Image Path
 app.use('/img', express.static('./public/img'))
 
-// Display Default Route
-app.use('/', (req, res) => {
-  res.send('Psst, Your Backend is Online.')
-})
+app.use(history({
+  verbose: true
+}))
+
+// Deploy FrontEndPath
+app.use('/', express.static('./dist'))
 
 // Server HTTP Socket IO
 const server = http.createServer(app)
