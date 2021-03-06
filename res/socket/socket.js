@@ -15,7 +15,7 @@ const io = socketio(server, {
 io.on('connection', (socket) => {
   // Panggil Model user & Chat
   const { mGetFriends, mPatchUser, mLogout, mSearchUser, mAddFriends, mDeleteFriends, mDetailUser} = require('../models/users')
-  const { mGetChat, mSendChat, mDetailChat} = require('../models/chat')
+  const { mGetChat, mSendChat, mDetailChat, mDeleteChat} = require('../models/chat')
   // Notif User ada Yang Online
   socket.on('connected', (data) => {
     const socketData = {socketId: socket.id}
@@ -125,6 +125,7 @@ io.on('connection', (socket) => {
                 mDetailUser(data.senderId)
                   .then((resSender) => {
                     io.to(response[0].targetRoomId).emit('res-get-list-chat', response)
+                    io.to(response[0].senderRoomId).emit('res-target-data', resTarget[0])
                     io.to(resTarget[0].roomId).emit('res-new-chat', {data: 'New Message', from: resSender[0].name, message: data.msg })
                     io.to(response[0].senderRoomId).emit('res-get-list-chat', response)
                   })
@@ -228,5 +229,37 @@ io.on('connection', (socket) => {
         console.log(err)
       })
   })
-})
+  // Hapus Chat
+  socket.on('delete-chat', (data) => {
+    mDeleteChat(data.id)
+      .then((res1) => {
+        mGetChat(data)
+          .then((response) => {
+            mDetailUser(data.targetId)
+              .then((resTarget) => {
+                mDetailUser(data.senderId)
+                  .then((resSender) => {
+                    io.to(response[0].targetRoomId).emit('res-get-list-chat', response)
+                    io.to(response[0].senderRoomId).emit('res-get-list-chat', response)
+                  })
+                  .catch((err) => {
+                    // Error dari Sender
+                    console.log(err)
+                  })
+              })
+              // Error dari target
+              .catch((err) => {
+                console.log(err)
+              })
+        })
+        // Error cari History Chat
+        .catch((err) => {
+          console.log(err)
+        })
+      })
+      .catch((err) => {
+        console.log(err)
+      })
+    })
+  })
 }
